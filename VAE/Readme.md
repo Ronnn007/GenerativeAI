@@ -28,3 +28,19 @@ A scatter plot of points in the latent space was generated, visualizing the dist
 ![](https://github.com/Ronnn007/GenerativeAI/blob/main/VAE/Graphs/Generated%20Images.jpg)
 
 Finally sample digits were generated from random points in the latent space. These generated images showcase the model's ability to create new, realistic digit images.
+
+## VAE With CELEBA Dataset
+A model with similar architecture was also trained using the Celeba dataset.
+Here are few samples from the dataset, different images from various categories (40 total)
+
+![](https://github.com/Ronnn007/GenerativeAI/blob/main/VAE/Graphs/celeba%20image%20samples.jpg)
+
+Rest of the model training hyperparameters were the same as during training of the MNIST Dataset, However the following were adjusted:
+* LR = 0.0001
+* LATENT_DIM = 200
+
+### Training Loss graph:
+![](https://github.com/Ronnn007/GenerativeAI/blob/main/VAE/Graphs/Training%20loss%20with%20Kl%20divergence-%20Celeba.jpg)
+
+### Generated Images:
+![](https://github.com/Ronnn007/GenerativeAI/blob/main/VAE/Graphs/Generated%20Images%20-%20Celeba.jpg)
