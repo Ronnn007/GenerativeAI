@@ -44,3 +44,25 @@ Rest of the model training hyperparameters were the same as during training of t
 
 ### Generated Images:
 ![](https://github.com/Ronnn007/GenerativeAI/blob/main/VAE/Graphs/Generated%20Images%20-%20Celeba.jpg)
+
+## BETA-VAE
+Utilising a Standard Normal Distribution for latent space can lead to entangled representations where multiple latent variables influence same features for reconstructed image. Inorder to encourage sparsity and disentanglement a β hyperparameter is introduced within the latent space.
+#### The overall loss function now introduces this Beta Hyperparameter 
+![](https://github.com/Ronnn007/GenerativeAI/blob/main/VAE/Graphs/Loss%20function.jpg)
+
+Where β > 1 adds additional penalising to (i),(ii) and (iii) and  forces compression of z at the expense of reconstruction.
+#### To simplify now the loss function has changed to:
+![Loss](https://latex.codecogs.com/gif.image?\large&space;\dpi{110}L_{B-VAE}=L_{Recon}&plus;\beta\times&space;L_{KL})
+#### For the experimentation below, these are the Hyperparameter values:
+* LR = 0.0001
+* BATCH_SIZE = 32
+* EPOCHS = 50
+* LATENT_DIM = 400
+* β = 5
+
+### Training Loss Graph:
+![](https://github.com/Ronnn007/GenerativeAI/blob/main/VAE/Graphs/Beta-Training%20plots.jpg)
+
+### Finally, The generated Images:
+![](https://github.com/Ronnn007/GenerativeAI/blob/main/VAE/Graphs/Beta-%20Generated%20images.jpg)
+We can notice a significant difference within facial expressions compared to previous VAE generated samples. Additionally, we can also notice further details in terms of quality.
