@@ -36,6 +36,50 @@ To prevent the generator from utilising the same latent space during training, i
 
 
 ### StyleGAN 2
+The artifacts droplets found in StyleGAN were pinpointed to the AdaIN operation by the authors, hence this operation is revisited.
 #
-Key innovations:
+#### Key innovations:
+Style Modulation and Demodulation [5]
 
+<img src="https://miro.medium.com/v2/resize:fit:726/1*yA9loND0aVvMNDT62lfwqg.png" width="500"/> <img src="https://miro.medium.com/v2/resize:fit:730/1*RW7QRBRuWiGrj-l9iY5xIg.png" width="500"/>
+#### Changes #1 Revised Architecture
+The typical line of operations for AdaIN are Normalisation and Demodulation and both operations operate on mean and standard deviation per feature map. 
+- Within each style block or AdaIN operation that is active, the authors [2] find that moving the bias and noise operations outside the style block makes the result more predictable (Revised Architecture).
+  
+- Where these operations operate on normalised data. Additionally, with this change, it is sufficient for Normalisation and Demodulation to operate with Standard deviation alone, excluding the mean.
+
+#### Changes #2 Weight Modulation & Demodulation
+The modulation or normalisation scales each input feature map of the convolution based on the incoming style, and for each convolutional layer, the weights 𝑊 are modulated by the style vector 𝑤 before the convolution operation. 
+
+For example [5]
+<img src="https://miro.medium.com/v2/resize:fit:754/1*ydbNXYzaFrmni_vcxljc-g.png" width="500"/>
+
+Changes 
+- First the Mod std and Conv operations are combined to be W′ = W ⋅ diag(s(w))
+- And the Norm std becomes weight demodulation.
+
+The modulation scales each input feature map of the convolution based on the incoming style, which can alternatively be implemented by scaling the convolution weights: w’ᵢⱼₖ = sᵢ ⋅ wᵢⱼₖ
+  - w : original weights
+  - w’ : modulated weights
+  - sᵢ : the scale corresponding to the ith input feature map
+  - j, k : spatial indices of the output feature maps
+
+The demodulation operation helps maintain consistent and stable activations, especially after the modulation operation. 
+- Stable activation overall help prevent artefacts from the generated images.
+- This is revised and implemented as: <img src="https://miro.medium.com/v2/resize:fit:351/1*9_hEaAn0L8LpEzbJnX31jQ.png" width="250"/>
+- Where 𝑊′′ are the demodulated weights, and 𝜖 is a small constant to prevent division by zero.
+- This is what it looks like in practice [5] : <img src="https://miro.medium.com/v2/resize:fit:496/1*wVRMFwx5lgMoiB8ep_eaJQ.png" width="300"/>
+
+#### Changes #3 Changes within the Architecture
+Additionally, the authors also revisited and reviewed the progressive growing technique for training StyleGan2 model. 
+
+It was discovered that progressive growing has a strong location preference. 
+- For example, the authors showcase features such as teeth or eyes do not move smoothly over the image. Where even though a face is generated from different angles, the teeth are static throughout rather than accompanying the angel of generation.
+- The authors also identify that skip connections within the generator helps configure the Perceptual Path Length regularisation and the residual connections benefit the FID regularisation. Hence, within StyleGan2, the generator utilises skip connections, and the discriminator uses residual connections to benefit both regularisation scores.
+
+#### References
+      [1] 1.Karras T, Laine S, Aila T. A Style-Based Generator Architecture for Generative Adversarial Networks [Internet]. arXiv.org. 2018 [cited 2024 Aug 21]. Available from: https://arxiv.org/abs/1812.04948
+      [2] 2.Karras T, Laine S, Aittala M, Hellsten J, Lehtinen J, Aila T. Analyzing and Improving the Image Quality of StyleGAN. arXiv:191204958 [cs, eess, stat] [Internet]. 2020 Mar 23 [cited 2024 Aug 21]; Available from: https://arxiv.org/abs/1912.04958
+      [3] christianversloot. machine-learning-articles/stylegan-a-step-by-step-introduction.md at main · christianversloot/machine-learning-articles [Internet]. GitHub. 2022 [cited 2024 Aug 21]. Available from: https://github.com/christianversloot/machine-learning-articles/blob/main/stylegan-a-step-by-step-introduction.md
+      [4] 4.lernapparat. lernapparat/style_gan/pytorch_style_gan.ipynb at master · lernapparat/lernapparat [Internet]. GitHub. 2024 [cited 2024 Aug 21]. Available from: https://github.com/lernapparat/lernapparat/blob/master/style_gan/pytorch_style_gan.ipynb
+      [5] Steins. StyleGAN vs StyleGAN2 vs StyleGAN2-ADA vs StyleGAN3 [Internet]. Medium. Medium; 2022 [cited 2024 Aug 21]. Available from: https://medium.com/@steinsfu/stylegan-vs-stylegan2-vs-stylegan2-ada-vs-stylegan3-c5e201329c8a
